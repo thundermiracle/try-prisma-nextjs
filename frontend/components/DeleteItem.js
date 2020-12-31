@@ -1,9 +1,9 @@
-import React from 'react'
-import PropTypes from 'prop-types'
-import { Mutation } from 'react-apollo'
-import gql from 'graphql-tag'
+import React from "react";
+import PropTypes from "prop-types";
+import { Mutation } from "react-apollo";
+import gql from "graphql-tag";
 
-import { ALL_ITEMS_QUERY } from './Items'
+import { ALL_ITEMS_QUERY } from "./Items";
 
 const DELETE_ITEM_MUTATION = gql`
   mutation DELETE_ITEM_MUTATION($id: ID!) {
@@ -20,33 +20,33 @@ const DeleteItem = ({ id, children }) => {
     const data = cache.readQuery({ query: ALL_ITEMS_QUERY });
 
     // 2. filter the deleted item out of the page
-    data.items = data.items.filter(item => item.id !== id);
+    const items = data.items.filter((item) => item.id !== id);
 
     // 3. put the items back
-    cache.writeQuery({ query: ALL_ITEMS_QUERY }, data);
-  }
+    cache.writeQuery({ query: ALL_ITEMS_QUERY, data: { ...data, items } });
+  };
 
   return (
     <Mutation
       mutation={DELETE_ITEM_MUTATION}
-      variables={{id}}
+      variables={{ id }}
       update={update}
     >
-      {
-        (deleteItem, { error, loading }) => (
-          <button onClick={() => {
-            if (confirm('Are you sure?')) {
+      {(deleteItem, { error, loading }) => (
+        <button
+          onClick={() => {
+            if (confirm("Are you sure?")) {
               deleteItem();
             }
-          }}>{children}</button>
-        )
-      }
+          }}
+        >
+          {children}
+        </button>
+      )}
     </Mutation>
-  )
-}
+  );
+};
 
-DeleteItem.propTypes = {
+DeleteItem.propTypes = {};
 
-}
-
-export default DeleteItem
+export default DeleteItem;

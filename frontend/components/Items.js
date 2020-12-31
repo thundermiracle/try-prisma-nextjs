@@ -33,7 +33,7 @@ const ItemList = style.div`
 
 const Items = props => {
   return (
-    <div>
+    <Center>
       Items
       <Query query={ALL_ITEMS_QUERY}>
         {
@@ -51,7 +51,7 @@ const Items = props => {
           }
         }
       </Query>
-    </div>
+    </Center>
   )
 }
 
