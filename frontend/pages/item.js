@@ -1,11 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import SingleItem from '../components/SingleItem'
 
-const ItemPage = props => {
+const ItemPage = ({ query }) => {
   return (
-    <div>
-      <p>Single Item</p>
-    </div>
+    <SingleItem id={query.id} />
   )
 }
 

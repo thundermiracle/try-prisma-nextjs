@@ -1,14 +1,17 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from "react";
+import PropTypes from "prop-types";
 
-import { Query } from 'react-apollo';
-import gql from 'graphql-tag';
-import style from 'styled-components';
-import Item from './Item';
+import { Query } from "react-apollo";
+import gql from "graphql-tag";
+import style from "styled-components";
+import ErrorMessage from "./ErrorMessage";
+import Item from "./Item";
+import Pagination from './Pagination'
+import { perPage } from "../config";
 
 export const ALL_ITEMS_QUERY = gql`
-  query ALL_ITEMS_QUERY {
-    items {
+  query ALL_ITEMS_QUERY($skip: Int!, $first: Int!) {
+    items(skip: $skip, first: $first, orderBy: createdAt_DESC) {
       id
       title
       price
@@ -27,36 +30,40 @@ const ItemList = style.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 60px;
-  max-width: ${props => props.theme.maxWidth};
+  max-width: ${(props) => props.theme.maxWidth};
   margin: 0 auto;
 `;
 
-const Items = props => {
+const Items = ({ page }) => {
   return (
     <Center>
-      Items
-      <Query query={ALL_ITEMS_QUERY}>
-        {
-          ({data, error, loading}) => {
-            if (loading) return <p>loading...</p>;
-            if (error) return <p>Error: {error.message}</p>;
-
-            return (
-              <ItemList>
-                {
-                  data.items.map(item => <Item item={item} key={item.id} />)
-                }
-              </ItemList>
-            )
-          }
+      <Pagination page={page} />
+      <Query
+        query={ALL_ITEMS_QUERY}
+        fetchPolicy="network-only"
+        variables={{
+          skip: (page - 1) * perPage,
+          first: perPage
         }
+        }>
+        {({ data, error, loading }) => {
+          if (loading) return <p>loading...</p>;
+          if (error) return <ErrorMessage error={error} />;
+
+          return (
+            <ItemList>
+              {data.items.map((item) => (
+                <Item item={item} key={item.id} />
+              ))}
+            </ItemList>
+          );
+        }}
       </Query>
+      <Pagination page={page} />
     </Center>
-  )
-}
+  );
+};
 
-Items.propTypes = {
-
-}
+Items.propTypes = {};
 
 export default Items;
