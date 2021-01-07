@@ -11,7 +11,6 @@ const Query = {
   itemsConnection: forwardTo("db"),
   async me(parent, args, ctx, info) {
     const userId = ctx.request.userId;
-    console.log("ctx.request:", ctx.request.userId, ctx.request.cookies);
     if (!userId) {
       return null;
     }
