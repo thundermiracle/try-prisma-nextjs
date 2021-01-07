@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { randomBytes } = require("crypto");
 const { promisify } = require("util");
+const { transport, makeEmail } = require("../mail");
 
 const tokenToCookie = (userId, ctx) => {
   const token = jwt.sign({ userId }, process.env.APP_SECRET);
@@ -110,6 +111,15 @@ const Mutations = {
     });
 
     // email user
+    const resetTokenLink = `${
+      process.env.FRONTEND_URL
+    }/reset?resetToken=${resetToken}`;
+    const mailRes = await transport.sendMail({
+      from: "info@thundermiracle.com",
+      to: user.email,
+      subject: "Your password reset link",
+      html: makeEmail(`<a href="${resetTokenLink}">${resetTokenLink}</a>`),
+    });
 
     // return message
     return { message: "Success!" };
