@@ -1,10 +1,12 @@
-import Link from 'next/link';
-import CreateItem from '../components/CreateItem';
+import Link from "next/link";
+import CreateItem from "../components/CreateItem";
 
-const Sell = props => (
+import withSignIn from "../components/hoc/withSignIn";
+
+const Sell = (props) => (
   <div>
     <CreateItem />
   </div>
 );
 
-export default Sell;
+export default withSignIn(Sell);

@@ -1,10 +1,7 @@
 import Link from "next/link";
 import UpdateItem from "../components/UpdateItem";
+import withSignIn from "../components/hoc/withSignIn";
 
-const Update = props => (
-  <div>
-    <UpdateItem id={props.query.id} />
-  </div>
-);
+const Update = (props) => <UpdateItem id={props.query.id} />;
 
-export default Update;
+export default withSignIn(Update);
