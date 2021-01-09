@@ -3,22 +3,18 @@ const jwt = require("jsonwebtoken");
 const { randomBytes } = require("crypto");
 const { promisify } = require("util");
 const { transport, makeEmail } = require("../mail");
-
-const tokenToCookie = (userId, ctx) => {
-  const token = jwt.sign({ userId }, process.env.APP_SECRET);
-  // set jwt to cookie
-  ctx.response.cookie("token", token, {
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24, // 1 day cookie
-  });
-};
+const {
+  checkIfUserLoggedIn,
+  setTokenToCookie,
+  hasPermission,
+  getCurrentUser,
+} = require("../utils");
 
 const Mutations = {
   async createItem(parent, args, ctx, info) {
-    if (!ctx.request.userId) {
-      throw new Error("You must be logged in to do that!");
-    }
+    checkIfUserLoggedIn(ctx);
 
+    const currentUser = await getCurrentUser(ctx);
     const item = await ctx.db.mutation.createItem(
       {
         // create relationship between items & user
@@ -27,7 +23,7 @@ const Mutations = {
             id: ctx.request.userId,
           },
         },
-        data: { ...args },
+        data: { ...args, user: currentUser },
       },
       info,
     );
@@ -51,9 +47,17 @@ const Mutations = {
 
   async deleteItem(parent, args, ctx, info) {
     const where = { id: args.id };
-    const item = await ctx.db.query.item({ where }, `{ id title }`);
+    const item = await ctx.db.query.item({ where }, `{ id title user { id } }`);
 
     // check user permission
+    const currentUser = await getCurrentUser(ctx);
+    const ownsItem = item.user.id === ctx.request.userId;
+    const hasPermissionToDeleteItem = currentUser.permissions.some(permission =>
+      ["ADMIN", "ITEMDELETE"].includes(permission),
+    );
+    if (!ownsItem && !hasPermissionToDeleteItem) {
+      throw new Error("You don't have permission to do that");
+    }
 
     return ctx.db.mutation.deleteItem({ where }, info);
   },
@@ -76,7 +80,7 @@ const Mutations = {
       info,
     );
     // create the JWT token
-    tokenToCookie(user.id, ctx);
+    setTokenToCookie(user.id, ctx);
 
     return user;
   },
@@ -95,7 +99,7 @@ const Mutations = {
     }
 
     // create the JWT token
-    tokenToCookie(user.id, ctx);
+    setTokenToCookie(user.id, ctx);
 
     return user;
   },
@@ -171,12 +175,35 @@ const Mutations = {
     });
 
     // replace to new password
-    tokenToCookie(updatedUser.id, ctx);
+    setTokenToCookie(updatedUser.id, ctx);
 
     // Generate JWT
     // set JWT to cookie
     // return a new user
     return updatedUser;
+  },
+
+  async updatePermissions(parent, { permissions, userId }, ctx, info) {
+    // check if logged in
+    checkIfUserLoggedIn(ctx);
+
+    // query current user
+    const currentUser = await getCurrentUser(ctx);
+
+    // check the permission to do this
+    hasPermission(currentUser, ["ADMIN", "PERMISSIONUPDATE"]);
+
+    // update target user's permissions
+    return ctx.db.mutation.updateUser({
+      data: {
+        permissions: {
+          set: permissions,
+        },
+      },
+      where: {
+        id: userId,
+      },
+    });
   },
 };
 
