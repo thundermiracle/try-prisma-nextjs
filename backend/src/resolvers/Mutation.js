@@ -14,16 +14,17 @@ const Mutations = {
   async createItem(parent, args, ctx, info) {
     checkIfUserLoggedIn(ctx);
 
-    const currentUser = await getCurrentUser(ctx);
     const item = await ctx.db.mutation.createItem(
       {
-        // create relationship between items & user
-        user: {
-          connect: {
-            id: ctx.request.userId,
+        data: {
+          ...args,
+          // create relationship between items & user
+          user: {
+            connect: {
+              id: ctx.request.userId,
+            },
           },
         },
-        data: { ...args, user: currentUser },
       },
       info,
     );

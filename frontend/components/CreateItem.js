@@ -39,7 +39,7 @@ const CreateItem = (props) => {
 
   const handleChange = (e) => {
     const { name, type, value } = e.target;
-    const val = type === "number" ? parseFloat(value) : value;
+    const val = type === "number" ? (parseFloat(value) || 0) : value;
 
     setState({
       ...state,
