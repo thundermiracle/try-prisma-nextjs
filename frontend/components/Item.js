@@ -7,6 +7,7 @@ import ItemStyles from './styles/ItemStyles';
 import PriceTag from './styles/PriceTag';
 import formatMoney from '../lib/formatMoney';
 import DeleteItem from './DeleteItem';
+import AddToCart from './AddToCart'
 
 const Item = ({ item: { id, title, price, description, image } }) => {
   return (
@@ -29,7 +30,7 @@ const Item = ({ item: { id, title, price, description, image } }) => {
         <Link href={{ pathname: "update", query: { id } }}>
           <button><a>Edit</a></button>
         </Link>
-        <button>Add to Cart</button>
+        <AddToCart id={id} />
         <DeleteItem id={id}>Delete this item</DeleteItem>
       </div>
     </ItemStyles>
