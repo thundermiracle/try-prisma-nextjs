@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const { randomBytes } = require("crypto");
 const { promisify } = require("util");
 const { transport, makeEmail } = require("../mail");
+const stripe = require("../stripe");
 const {
   checkIfUserLoggedIn,
   setTokenToCookie,
@@ -277,6 +278,49 @@ const Mutations = {
       },
       info,
     );
+  },
+
+  async createOrder(parent, { token }, ctx, info) {
+    // Check if logged in
+    checkIfUserLoggedIn(ctx);
+    const currentUser = await getCurrentUser(
+      ctx,
+      `{
+          id
+          name
+          email
+          cart {
+            id
+            quantity
+            item {
+              id
+              title
+              price
+              description
+              image
+            }
+          }
+        }`,
+    );
+
+    // Recalculate the price again on server side
+    const amount = currentUser.cart.reduce(
+      (prevAmount, cartItem) =>
+        prevAmount + cartItem.item.price * cartItem.quantity,
+      0,
+    );
+
+    // Create the stripe charge
+    const charge = await stripe.charges.create({
+      amount,
+      currency: "JPY",
+      source: token,
+    });
+
+    // Convert CartItems to OrderItems
+    // Create Order
+    // Clean up -- delete cart, delete cartitems
+    // return Order
   },
 };
 

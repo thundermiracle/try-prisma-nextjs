@@ -13,6 +13,7 @@ import SickButton from "./styles/SickButton";
 
 import calcTotalPrice from "../lib/calcTotalPrice";
 import formatMoney from "../lib/formatMoney";
+import TakeMyMoney from "./TakeMyMoney";
 
 export const LOCAL_STATE_QUERY = gql`
   query {
@@ -59,7 +60,9 @@ const Cart = (props) => {
             </ul>
             <footer>
               <p>{formatMoney(calcTotalPrice(me.cart))}</p>
-              <SickButton>Checkout</SickButton>
+              <TakeMyMoney>
+                <SickButton>Checkout</SickButton>
+              </TakeMyMoney>
             </footer>
           </CartStyles>
         );

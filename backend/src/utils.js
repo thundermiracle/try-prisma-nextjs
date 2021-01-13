@@ -31,14 +31,14 @@ const setTokenToCookie = (userId, ctx) => {
   });
 };
 
-const getCurrentUser = async ctx => {
+const getCurrentUser = async (ctx, queryString = "{ id, permissions }") => {
   const currentUser = await ctx.db.query.user(
     {
       where: {
         id: ctx.request.userId,
       },
     },
-    "{ id, permissions }",
+    queryString,
   );
 
   return currentUser;
