@@ -39,6 +39,32 @@ const Query = {
     const allUsers = await ctx.db.query.users({}, info);
     return allUsers;
   },
+
+  async order(parent, { id }, ctx, info) {
+    // check if user is logged in
+    checkIfUserLoggedIn(ctx);
+    const currentUser = await getCurrentUser(ctx);
+
+    // query order
+    const order = await ctx.db.query.order(
+      {
+        where: { id },
+      },
+      info,
+    );
+    if (!order) {
+      throw new Error("Order not exist.");
+    }
+
+    // check permission
+    const ownOrder = order.user.id === currentUser.id;
+    const hasPermissionToSeeOrder = currentUser.permissions.includes("ADMIN");
+    if (!ownOrder && !hasPermissionToSeeOrder) {
+      throw new Error("You're not permitted to see this.");
+    }
+
+    return order;
+  },
 };
 
 module.exports = Query;

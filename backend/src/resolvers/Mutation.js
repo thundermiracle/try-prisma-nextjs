@@ -298,6 +298,7 @@ const Mutations = {
               price
               description
               image
+              largeImage
             }
           }
         }`,
@@ -318,9 +319,45 @@ const Mutations = {
     });
 
     // Convert CartItems to OrderItems
+    const orderItems = currentUser.cart.map(cartItem => {
+      const orderItem = {
+        ...cartItem.item,
+        quantity: cartItem.quantity,
+        user: {
+          connect: {
+            id: currentUser.id,
+          },
+        },
+      };
+
+      delete orderItem.id;
+      return orderItem;
+    });
+
     // Create Order
+    const order = await ctx.db.mutation.createOrder({
+      data: {
+        items: { create: orderItems },
+        total: charge.amount,
+        charge: charge.id,
+        user: {
+          connect: {
+            id: currentUser.id,
+          },
+        },
+      },
+    });
+
     // Clean up -- delete cart, delete cartitems
+    const cartItemIds = currentUser.cart.map(({ id }) => id);
+    await ctx.db.mutation.deleteManyCartItems({
+      where: {
+        id_in: cartItemIds,
+      },
+    });
+
     // return Order
+    return order;
   },
 };
 

@@ -29,10 +29,19 @@ const totalItem = (cart) =>
   cart.reduce((prevCount, cartItem) => prevCount + cartItem.quantity, 0);
 
 const TakeMyMoney = ({ children }) => {
-  const handleToken = (createOrder) => ({ id }) => {
-    createOrder({
+  const handleToken = (createOrder) => async ({ id }) => {
+    NProgress.start();
+
+    const res = await createOrder({
       variables: { token: id },
     }).catch((err) => alert(err.message));
+
+    NProgress.done();
+
+    Router.push({
+      pathname: "/order",
+      query: { id: res.data.createOrder.id },
+    });
   };
 
   return (
@@ -50,7 +59,11 @@ const TakeMyMoney = ({ children }) => {
                   amount={calcTotalPrice(me.cart)}
                   name="Sick Fits"
                   description={`Order of ${totalItem(me.cart)} items!`}
-                  image={me.cart[0].item && me.cart[0].item.image}
+                  image={
+                    me.cart.length > 0 &&
+                    me.cart[0].item &&
+                    me.cart[0].item.image
+                  }
                   stripeKey="pk_test_51I8z6ZLpYHsuoWLR6LI8KnoO4Vn9xDlJ8LA8FsqG85LAjNZKF3jNNfguCKURwMn3ZtoJwncdMxDn7njMJ3QlJ63b00ox1IhDLM"
                   email={me.email}
                   token={handleToken(createOrder)}
