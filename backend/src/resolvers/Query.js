@@ -65,6 +65,24 @@ const Query = {
 
     return order;
   },
+
+  async orders(parent, args, ctx, info) {
+    // check if user is logged in
+    checkIfUserLoggedIn(ctx);
+    const currentUser = await getCurrentUser(ctx);
+
+    // query orders
+    const orders = await ctx.db.query.orders(
+      {
+        user: {
+          id: currentUser.id,
+        },
+      },
+      info,
+    );
+
+    return orders;
+  },
 };
 
 module.exports = Query;
