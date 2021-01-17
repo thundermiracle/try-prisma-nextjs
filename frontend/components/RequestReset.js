@@ -8,7 +8,7 @@ import { CURRENT_USER_QUERY } from "./User";
 import Form from "./styles/Form";
 import ErrorMessage from "./ErrorMessage";
 
-const REQUESTRESET_MUTATION = gql`
+export const REQUESTRESET_MUTATION = gql`
   mutation REQUESTRESET_MUTATION($email: String!) {
     requestReset(email: $email) {
       message
@@ -29,7 +29,11 @@ const Requestreset = (props) => {
   };
 
   return (
-    <Mutation mutation={REQUESTRESET_MUTATION} variables={state}>
+    <Mutation
+      mutation={REQUESTRESET_MUTATION}
+      variables={state}
+      onError={() => {}}
+    >
       {(requestreset, { error, loading, called }) => {
         return (
           <Form

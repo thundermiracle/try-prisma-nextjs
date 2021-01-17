@@ -1,8 +1,8 @@
 import { mount } from "enzyme";
-import Pagination, { PAGINATION_QUERY } from "../components/Pagination";
 import { MockedProvider } from "@apollo/react-testing";
 
 import { waitForComponentToPaint } from "../lib/testUtils";
+import Pagination, { PAGINATION_QUERY } from "../components/Pagination";
 
 const makeMocksFor = (count = 1) => [
   {

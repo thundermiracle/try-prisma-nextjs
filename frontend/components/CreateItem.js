@@ -30,16 +30,16 @@ const CREATE_ITEM_MUTATION = gql`
 
 const CreateItem = (props) => {
   const [state, setState] = React.useState({
-    title: "Cool shoes",
-    description: "Very cheap cool shoes",
+    title: "",
+    description: "",
     image: "",
     largeImage: "",
-    price: 100,
+    price: 0,
   });
 
   const handleChange = (e) => {
     const { name, type, value } = e.target;
-    const val = type === "number" ? (parseFloat(value) || 0) : value;
+    const val = type === "number" ? parseFloat(value) || 0 : value;
 
     setState({
       ...state,
@@ -48,7 +48,6 @@ const CreateItem = (props) => {
   };
 
   const uploadFile = async (e) => {
-    console.log("uploading ...file");
     const files = e.target.files;
     const data = new FormData();
     data.append("file", files[0]);
