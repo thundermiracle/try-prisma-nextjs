@@ -84,6 +84,12 @@ const waitForComponentToPaint = async (wrapper) => {
   });
 };
 
+const simInputChangeInWrapper = (wrapper, name, value, type) => {
+  wrapper.find(`input[name="${name}"]`).simulate("change", {
+    target: { name, value, type },
+  });
+};
+
 export {
   LocalStorageMock,
   fakeItem,
@@ -92,4 +98,5 @@ export {
   fakeOrder,
   fakeOrderItem,
   waitForComponentToPaint,
+  simInputChangeInWrapper,
 };

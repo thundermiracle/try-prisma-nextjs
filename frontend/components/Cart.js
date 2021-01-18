@@ -43,6 +43,7 @@ const Cart = (props) => {
           return null;
         }
         const me = user.data.me;
+        console.log("localState.data", localState.data);
 
         return (
           <CartStyles open={localState.data.cartOpen}>
