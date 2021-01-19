@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<AddToCart /> render correctly 1`] = `
+<button
+  disabled={false}
+  onClick={[Function]}
+>
+  Add
+   to Cart🛒
+</button>
+`;
