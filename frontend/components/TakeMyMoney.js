@@ -11,7 +11,7 @@ import calcTotalPrice from "../lib/calcTotalPrice";
 import ErrorMessage from "./ErrorMessage";
 import User, { CURRENT_USER_QUERY } from "./User";
 
-const CREATE_ORDER_MUTATION = gql`
+export const CREATE_ORDER_MUTATION = gql`
   mutation CREATE_ORDER_MUTATION($token: String!) {
     createOrder(token: $token) {
       id
@@ -28,31 +28,37 @@ const CREATE_ORDER_MUTATION = gql`
 const totalItem = (cart) =>
   cart.reduce((prevCount, cartItem) => prevCount + cartItem.quantity, 0);
 
+export const handleToken = (createOrder) => async ({ id }) => {
+  NProgress.start();
+
+  const res = await createOrder({
+    variables: { token: id },
+  }).catch((err) => alert(err.message));
+
+  NProgress.done();
+
+  Router.push({
+    pathname: "/order",
+    query: { id: res.data.createOrder.id },
+  });
+};
+
 const TakeMyMoney = ({ children }) => {
-  const handleToken = (createOrder) => async ({ id }) => {
-    NProgress.start();
-
-    const res = await createOrder({
-      variables: { token: id },
-    }).catch((err) => alert(err.message));
-
-    NProgress.done();
-
-    Router.push({
-      pathname: "/order",
-      query: { id: res.data.createOrder.id },
-    });
-  };
-
   return (
     <User>
-      {({ data: { me } }) => {
+      {({ data, loading }) => {
+        if (loading) return null;
+
+        const me = data.me;
         return (
           <Mutation
             mutation={CREATE_ORDER_MUTATION}
             refetchQueries={[{ query: CURRENT_USER_QUERY }]}
           >
             {(createOrder, { loading, error }) => {
+              if (loading) return <p>Loading...</p>;
+              if (error) return <ErrorMessage error={error} />;
+
               return (
                 <StripeCheckout
                   currency="JPY"

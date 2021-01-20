@@ -10,7 +10,7 @@ import OrderStyles from "./styles/OrderStyles";
 import formatMoney from "../lib/formatMoney";
 import ErrorMessage from "./ErrorMessage";
 
-const SINGLE_ORDER_QUERY = gql`
+export const SINGLE_ORDER_QUERY = gql`
   query SINGLE_ORDER_QUERY($id: ID!) {
     order(id: $id) {
       items {
@@ -63,9 +63,9 @@ const SingleOrder = ({ id }) => {
               <span>Order Total:</span>
               <span>{formatMoney(order.total)}</span>
             </p>
-            <p>
-              <span>Item Count:</span>
-              <span>{order.items.length}</span>
+            <p data-test="itemCount">
+              <span data-test="title">Item Count:</span>
+              <span data-test="data">{order.items.length}</span>
             </p>
             <div className="items">
               {order.items.map((item) => (
